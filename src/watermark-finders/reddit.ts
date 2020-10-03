@@ -1,9 +1,9 @@
 import Jimp from "jimp";
-import { logIfDebug } from "../util";
+import { within, logIfDebug } from "../util";
 
 // includes white
 function isRedditGrey({ r, g, b, a }) {
-  return r >= 39 && r == g && r == g && b >= r && b <= r + 2 && a == 255;
+  return r >= 36 && within(r - g, 5) && within(r - b, 5) && a == 255;
 }
 
 function isRedditBrandOrange({ r, g, b, a }) {
@@ -52,7 +52,7 @@ function isRedditWatermark(image: Jimp): boolean {
 
   // we accumulate error in a region of 54x33 (1782 pixels)
   // expect some error from jpeg and color blending
-  const passed = containsWatermark && error < 300 && error > 150;
+  const passed = containsWatermark && error < 300 && error > 120;
 
   console.log(
     `${passed ? "passed" : "failed"} reddit test with error: ${error}`

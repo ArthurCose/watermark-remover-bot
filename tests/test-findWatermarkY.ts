@@ -23,5 +23,5 @@ test("ifunny", (t) => {
 
 test("reddit", (t) => {
   const passing = images.filter((image) => findRedditWatermarkY(image) > 0);
-  t.is(passing.length, 1, "expect 1 passing");
+  t.is(passing.length, 2, "expect 2 passing");
 });
