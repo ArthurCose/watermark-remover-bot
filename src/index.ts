@@ -1,3 +1,5 @@
+import "./keepAwake";
+
 import {
   Client as DiscordClient,
   Message as DiscordMessage,
