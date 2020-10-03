@@ -1,7 +1,8 @@
 import Jimp from "jimp";
 import findIfunnyY from "./ifunny";
+import findRedditY from "./reddit";
 
-const watermarkFinders = [findIfunnyY];
+const watermarkFinders = [findIfunnyY, findRedditY];
 
 function findWatermarkY(image: Jimp): number {
   for (const findY of watermarkFinders) {

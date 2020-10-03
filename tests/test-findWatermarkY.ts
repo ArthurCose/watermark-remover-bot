@@ -2,7 +2,8 @@ import test, { before } from "ava";
 import fs from "fs-extra";
 import Jimp from "jimp";
 
-import findWatermarkY from "../src/watermark-finders/findWatermarkY";
+import findIfunnyWatermarkY from "../src/watermark-finders/ifunny";
+import findRedditWatermarkY from "../src/watermark-finders/reddit";
 
 const images = [];
 
@@ -15,7 +16,12 @@ before(async () => {
   images.push(...imagesPromise);
 });
 
-test("ifunny", async (t) => {
-  const passing = images.filter((image) => findWatermarkY(image) > 0);
+test("ifunny", (t) => {
+  const passing = images.filter((image) => findIfunnyWatermarkY(image) > 0);
   t.is(passing.length, 5, "expect 5 passing");
+});
+
+test("reddit", (t) => {
+  const passing = images.filter((image) => findRedditWatermarkY(image) > 0);
+  t.is(passing.length, 1, "expect 1 passing");
 });
