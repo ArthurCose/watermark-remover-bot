@@ -1,7 +1,7 @@
 import Koa from "koa";
 import fetch from "node-fetch";
 
-if (process.env.PORT) {
+if (process.env.URL) {
   const app = new Koa();
 
   app.use((ctx) => {
