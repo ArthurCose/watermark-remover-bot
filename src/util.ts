@@ -19,7 +19,7 @@ function isImageURL(url: string) {
 }
 
 function within(difference, range) {
-  return Math.abs(difference) < range;
+  return Math.abs(difference) <= range;
 }
 
 function logIfDebug(...args) {
