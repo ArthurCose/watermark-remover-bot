@@ -17,9 +17,6 @@ function isIfunnyWatermark(image: Jimp): boolean {
   const imageWidth = image.getWidth();
   const imageHeight = image.getHeight();
 
-  // this is to make sure we dont crop images with pure black bars
-  let containsBrandColor = false;
-
   if (imageHeight < 20) {
     return false;
   }
@@ -28,6 +25,7 @@ function isIfunnyWatermark(image: Jimp): boolean {
   const logoStart = imageWidth - 135 - jpegPadding;
   const logoEnd = imageWidth - 7 + jpegPadding;
 
+  let containsBrandColor = false; // this is to make sure we dont crop images with solid bars
   let error = 0;
 
   for (let y = imageHeight - 20 + jpegPadding; y < imageHeight; y++) {

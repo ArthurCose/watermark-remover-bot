@@ -13,21 +13,21 @@ function isRedditBrandOrange({ r, g, b, a }) {
 function isRedditWatermark(image: Jimp): boolean {
   const imageWidth = image.getWidth();
   const imageHeight = image.getHeight();
+  const watermarkHeight = Math.floor(imageHeight * 0.0736);
 
-  // this is to make sure we dont crop images with pure black bars
-  let containsBrandColor = false;
-
-  if (imageHeight < 33) {
+  if (imageHeight < watermarkHeight) {
     return false;
   }
 
   const jpegPadding = 3;
-  const logoStart = imageWidth - 59 - jpegPadding;
-  const logoEnd = imageWidth - 11 + jpegPadding;
+  const watermarkTop = imageHeight - watermarkHeight + jpegPadding;
+  const logoStart = Math.floor(imageWidth * 0.75);
+  const logoEnd = imageWidth;
 
+  let containsBrandColor = false; // this is to make sure we dont crop images with solid bars
   let error = 0;
 
-  for (let y = imageHeight - 33 + jpegPadding; y < imageHeight; y++) {
+  for (let y = watermarkTop; y < imageHeight; y++) {
     for (let x = 0; x < imageWidth; x++) {
       const color = Jimp.intToRGBA(image.getPixelColor(x, y));
 
@@ -50,9 +50,12 @@ function isRedditWatermark(image: Jimp): boolean {
     }
   }
 
-  // we accumulate error in a region of 54x33 (1782 pixels)
   // expect some error from jpeg and color blending
-  const passed = containsBrandColor && error < 300 && error > 120;
+  // needs to be dynamic due to watermark scaling
+  const passed =
+    containsBrandColor &&
+    error < watermarkHeight * 9 &&
+    error > watermarkHeight * 3;
 
   console.log(
     `${passed ? "passed" : "failed"} reddit test with error: ${error},`,

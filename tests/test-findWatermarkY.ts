@@ -17,11 +17,13 @@ before(async () => {
 });
 
 test("ifunny", (t) => {
+  console.log("ifunny");
   const passing = images.filter((image) => findIfunnyWatermarkY(image) > 0);
   t.is(passing.length, 5, "expect 5 passing");
 });
 
 test("reddit", (t) => {
+  console.log("reddit");
   const passing = images.filter((image) => findRedditWatermarkY(image) > 0);
-  t.is(passing.length, 2, "expect 2 passing");
+  t.is(passing.length, 3, "expect 3 passing");
 });
