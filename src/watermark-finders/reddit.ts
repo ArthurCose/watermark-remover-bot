@@ -10,10 +10,9 @@ function isRedditBrandOrange({ r, g, b, a }) {
   return r == 255 && g == 69 && b == 0 && a == 255;
 }
 
-function isRedditWatermark(image: Jimp): boolean {
+function isRedditWatermark(image: Jimp, watermarkHeight: number): boolean {
   const imageWidth = image.getWidth();
   const imageHeight = image.getHeight();
-  const watermarkHeight = Math.floor(imageHeight * 0.0736);
 
   if (imageHeight < watermarkHeight) {
     return false;
@@ -66,7 +65,14 @@ function isRedditWatermark(image: Jimp): boolean {
 }
 
 function findWatermarkY(image: Jimp): number {
-  return isRedditWatermark(image) ? image.getHeight() - 33 : -1;
+  const imageHeight = image.getHeight();
+  const watermarkHeight = Math.floor(imageHeight * 0.0736);
+
+  if (isRedditWatermark(image, watermarkHeight)) {
+    return imageHeight - watermarkHeight;
+  }
+
+  return -1;
 }
 
 export default findWatermarkY;
