@@ -38,7 +38,7 @@ function isIfunnyWatermark(image: Jimp): boolean {
       const isBlack = isIfunnyBlack(color);
 
       if (!inLogo && !isBlack) {
-        logIfDebug("failed ifunny test on:", x, y, color);
+        console.log("failed ifunny test on:", x, y, color);
         return false;
       }
 
