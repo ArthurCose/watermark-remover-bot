@@ -58,7 +58,7 @@ function isIfunnyWatermark(image: Jimp): boolean {
   const passed = containsBrandColor && error < 300 && error > 200;
 
   console.log(
-    `${passed ? "passed" : "failed"} reddit test with error: ${error},`,
+    `${passed ? "passed" : "failed"} ifunny test with error: ${error},`,
     ` contains brand color: ${containsBrandColor}`
   );
 
