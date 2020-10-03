@@ -1,15 +1,12 @@
 {
   "name": "watermark-remover-bot",
   "version": "1.0.0",
-  "description": "",
   "scripts": {
     "start": "ts-node src/index.ts",
     "build": "tsc",
     "clean": "rimraf build",
     "test": "npm run build && ava tests/*.ts"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "discord.js": "^12.3.1",
     "dotenv": "^8.2.0",
