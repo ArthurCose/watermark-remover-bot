@@ -18,7 +18,7 @@ function isIfunnyWatermark(image: Jimp): boolean {
   const imageHeight = image.getHeight();
 
   // this is to make sure we dont crop images with pure black bars
-  let containsWatermark = false;
+  let containsBrandColor = false;
 
   if (imageHeight < 20) {
     return false;
@@ -44,7 +44,7 @@ function isIfunnyWatermark(image: Jimp): boolean {
 
       if (inLogo) {
         if (isIfunnyBrandYellow(color)) {
-          containsWatermark = true;
+          containsBrandColor = true;
         } else if (!isBlack && !isIfunnyYellow(color)) {
           logIfDebug("accumulated error from:", x, y, color);
           error++;
@@ -55,10 +55,11 @@ function isIfunnyWatermark(image: Jimp): boolean {
 
   // we accumulate error in a region of 132x20 (2640 pixels)
   // expect some error from jpeg and color blending
-  const passed = containsWatermark && error < 300 && error > 200;
+  const passed = containsBrandColor && error < 300 && error > 200;
 
   console.log(
-    `${passed ? "passed" : "failed"} ifunny test with error: ${error}`
+    `${passed ? "passed" : "failed"} reddit test with error: ${error},`,
+    ` contains brand color: ${containsBrandColor}`
   );
 
   return passed;

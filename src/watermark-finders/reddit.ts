@@ -15,7 +15,7 @@ function isRedditWatermark(image: Jimp): boolean {
   const imageHeight = image.getHeight();
 
   // this is to make sure we dont crop images with pure black bars
-  let containsWatermark = false;
+  let containsBrandColor = false;
 
   if (imageHeight < 33) {
     return false;
@@ -41,7 +41,7 @@ function isRedditWatermark(image: Jimp): boolean {
 
       if (inLogo) {
         if (isRedditBrandOrange(color)) {
-          containsWatermark = true;
+          containsBrandColor = true;
         } else if (!isGrey) {
           logIfDebug("accumulated error from:", x, y, color);
           error++;
@@ -52,10 +52,11 @@ function isRedditWatermark(image: Jimp): boolean {
 
   // we accumulate error in a region of 54x33 (1782 pixels)
   // expect some error from jpeg and color blending
-  const passed = containsWatermark && error < 300 && error > 120;
+  const passed = containsBrandColor && error < 300 && error > 120;
 
   console.log(
-    `${passed ? "passed" : "failed"} reddit test with error: ${error}`
+    `${passed ? "passed" : "failed"} reddit test with error: ${error},`,
+    ` contains brand color: ${containsBrandColor}`
   );
 
   return passed;
