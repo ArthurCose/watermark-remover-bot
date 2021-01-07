@@ -19,7 +19,7 @@ before(async () => {
 test("ifunny", (t) => {
   console.log("ifunny");
   const passing = images.filter((image) => findIfunnyWatermarkY(image) > 0);
-  t.is(passing.length, 5, "expect 5 passing");
+  t.is(passing.length, 8, "expect 8 passing");
 });
 
 test("reddit", (t) => {

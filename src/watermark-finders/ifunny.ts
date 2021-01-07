@@ -53,7 +53,7 @@ function isIfunnyWatermark(image: Jimp): boolean {
 
   // we accumulate error in a region of 132x20 (2640 pixels)
   // expect some error from jpeg and color blending
-  const passed = containsBrandColor && error < 300 && error > 200;
+  const passed = containsBrandColor && error < 300 && error > 150;
 
   console.log(
     `${passed ? "passed" : "failed"} ifunny test with error: ${error},`,
