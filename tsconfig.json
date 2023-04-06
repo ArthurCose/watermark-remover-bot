@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
-    "downlevelIteration": true,
+    "target": "ES2021",
+    "moduleResolution": "nodenext",
     "esModuleInterop": true,
-    "outDir": "build"
+    "outDir": "build",
+    "module": "CommonJS"
   },
   "include": ["src/**/*", "tests/**/*"]
 }

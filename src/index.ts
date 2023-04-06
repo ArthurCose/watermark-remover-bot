@@ -1,36 +1,34 @@
-import "./keepAwake";
-
 import {
+  Attachment,
+  ClientEvents,
   Client as DiscordClient,
   Message as DiscordMessage,
-  FileOptions,
+  IntentsBitField,
+  OAuth2Scopes,
+  Partials,
+  PermissionFlagsBits,
 } from "discord.js";
 import findWatermarkY from "./watermark-finders/findWatermarkY";
 import { useCatcher, isImageURL } from "./util";
 import Jimp from "jimp";
-import fetch from "node-fetch";
 import { config as configEnv } from "dotenv";
-import { Stream } from "stream";
 
 configEnv();
 
-const client = new DiscordClient();
+const client = new DiscordClient({
+  intents: [
+    IntentsBitField.Flags.MessageContent,
+    // IntentsBitField.Flags.DirectMessages,
+    IntentsBitField.Flags.GuildMessages,
+    IntentsBitField.Flags.Guilds,
+  ],
+  partials: [Partials.Message, Partials.Channel],
+});
 
 // helpers
 
-function listenWithCatcher(event, listener) {
+function listenWithCatcher<K extends keyof ClientEvents>(event: K, listener) {
   client.on(event, useCatcher(listener));
-}
-
-async function getAttachmentBufferOrStream(
-  attachment: string | Buffer | Stream
-): Promise<Buffer | Stream> {
-  if (typeof attachment == "string") {
-    const res = await fetch(attachment);
-    return res.body;
-  }
-
-  return attachment;
 }
 
 // listeners
@@ -38,14 +36,24 @@ async function getAttachmentBufferOrStream(
 listenWithCatcher("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
 
-  client
-    .generateInvite(["SEND_MESSAGES", "MANAGE_MESSAGES", "ATTACH_FILES"])
-    .then((link) => console.log(`Invite with: ${link}`))
-    .catch(console.log);
+  const inviteUrl = client.generateInvite({
+    scopes: [OAuth2Scopes.Bot],
+    permissions: [
+      PermissionFlagsBits.SendMessages,
+      PermissionFlagsBits.SendMessagesInThreads,
+      PermissionFlagsBits.ManageMessages,
+      PermissionFlagsBits.AttachFiles,
+    ],
+  });
+
+  console.log(`Invite with ${inviteUrl}`);
 });
 
-listenWithCatcher("message", async (message: DiscordMessage) => {
-  if (process.env.DEBUG && message.channel.id != "761758145860730890") {
+listenWithCatcher("messageCreate", async (message: DiscordMessage) => {
+  if (
+    process.env.DEBUG_CHANNEL &&
+    process.env.DEBUG_CHANNEL != message.channel.id
+  ) {
     return;
   }
 
@@ -55,28 +63,28 @@ listenWithCatcher("message", async (message: DiscordMessage) => {
   }
 
   let foundWatermark = false;
-  const files: FileOptions[] = [];
+  const files: (Attachment | Buffer)[] = [];
 
-  for (const [id, messageAttachment] of message.attachments) {
-    let { attachment } = messageAttachment;
-
-    if (typeof attachment == "string" && isImageURL(attachment)) {
-      let image = await Jimp.read(attachment);
-
-      const y = findWatermarkY(image);
-
-      if (y > 0) {
-        image = image.crop(0, 0, image.getWidth(), y);
-
-        attachment = await image.getBufferAsync("image/png");
-        foundWatermark = true;
-      }
+  for (const [_id, inputAttachment] of message.attachments) {
+    if (!isImageURL(inputAttachment.url)) {
+      files.push(inputAttachment);
+      continue;
     }
 
-    files.push({
-      attachment: await getAttachmentBufferOrStream(attachment),
-      name: messageAttachment.name,
-    });
+    let image = await Jimp.read(inputAttachment.url);
+
+    const y = findWatermarkY(image);
+
+    if (y == -1) {
+      files.push(inputAttachment);
+      continue;
+    }
+
+    image = image.crop(0, 0, image.getWidth(), y);
+    foundWatermark = true;
+
+    const attachment = await image.getBufferAsync("image/png");
+    files.push(attachment);
   }
 
   // no need to delete + reupload post if there's no watermarked images
@@ -84,13 +92,16 @@ listenWithCatcher("message", async (message: DiscordMessage) => {
     return;
   }
 
-  await Promise.all([
-    message.delete(),
-    message.channel.send({
-      content: `<@${message.author.id}> uploaded:\n${message.content}`,
-      files,
-    }),
-  ]);
+  const outgoingMessage = {
+    content: `<@${message.author.id}> uploaded:\n${message.content}`,
+    files,
+  };
+
+  let outgoingPromise = message.thread
+    ? message.thread.send(outgoingMessage)
+    : message.channel.send(outgoingMessage);
+
+  await Promise.all([message.delete(), outgoingPromise]);
 });
 
 client.login(process.env.BOT_TOKEN);

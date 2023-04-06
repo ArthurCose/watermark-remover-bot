@@ -1,5 +1,5 @@
-import test, { before } from "ava";
-import fs from "fs-extra";
+import test from "ava";
+import fs from "fs/promises";
 import Jimp from "jimp";
 
 import findIfunnyWatermarkY from "../src/watermark-finders/ifunny";
@@ -7,7 +7,7 @@ import findRedditWatermarkY from "../src/watermark-finders/reddit";
 
 const images = [];
 
-before(async () => {
+test.before(async () => {
   const folderPath = "tests/files/";
   const imagePaths = await fs.readdir(folderPath);
   const imagePromises = imagePaths.map((path) => Jimp.read(folderPath + path));

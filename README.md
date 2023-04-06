@@ -8,11 +8,12 @@ Watermark Remover Bot is a Discord bot that detects and removes easily croppable
 
 Drop images in `tests/files`, sync `tests/test-findWatermarkY.ts` with the types of images you're testing against. `npm test` will run [ava](https://www.npmjs.com/package/ava) on `*.ts` files in `tests/`
 
-## Hosting
+## Environment
 
-This project is built to run on [heroku](https://heroku.com), and requires environment variable `BOT_TOKEN` and optional variable `URL`.
-
-`URL` should be set to the domain assigned by heroku, it's used in `src/keepAwake.ts` to prevent automatic shutdown on the free tier.
+- `BOT_TOKEN`
+  - Required, found in Developer Portal -> \[App Name\] -> Bot -> `Reset Token`
+- `DEBUG_CHANNEL`
+  - Set to a channel id to restrict the bot to a specific channel for local testing.
 
 ## Screenshots
 
