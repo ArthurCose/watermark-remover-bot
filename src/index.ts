@@ -71,7 +71,14 @@ listenWithCatcher("messageCreate", async (message: DiscordMessage) => {
       continue;
     }
 
-    let image = await Jimp.read(inputAttachment.url);
+    let image: Jimp;
+
+    try {
+      image = await Jimp.read(inputAttachment.url);
+    } catch {
+      files.push(inputAttachment);
+      continue;
+    }
 
     const y = findWatermarkY(image);
 
